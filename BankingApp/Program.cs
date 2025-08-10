@@ -15,7 +15,7 @@ class Program
             return;
         }
 
-        var account = new BankAccount(name);
+        var account = BankService.GetOrCreateAccount(name);
 
         while (true)
         {
