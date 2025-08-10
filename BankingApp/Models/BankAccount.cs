@@ -40,5 +40,10 @@ namespace BankingApp.Models
         {
             return $"Balance: {Balance:C}";
         }
+
+        public override string ToString()
+        {
+            return $"Account name: {Owner}.\nAccount Balance: {Balance}";
+        }
     }
 }
