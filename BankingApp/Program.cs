@@ -88,9 +88,3 @@ class Program
         }
     }
 }
-
-public enum TransactionType
-{
-    Deposit,
-    Withdraw
-}
