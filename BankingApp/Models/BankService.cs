@@ -16,7 +16,7 @@ namespace BankingApp.Models
         {
             string? directory = Path.GetDirectoryName(filePath);
 
-            if (!String.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
             }
@@ -61,6 +61,21 @@ namespace BankingApp.Models
             }
 
             return user;
+        }
+
+        public static void AddOrUpdateAccount(BankAccount account)
+        {
+            var accounts = LoadAccounts();
+
+            var existingUser = accounts.FirstOrDefault(a => a.Owner == account.Owner);
+
+            if(existingUser != null)
+            {
+                accounts.Remove(existingUser);
+            }
+
+            accounts.Add(account);
+            SaveAccounts(accounts);
         }
     }
 }
