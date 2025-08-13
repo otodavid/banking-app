@@ -41,6 +41,10 @@ class Program
                     break;
 
                 case "4":
+                    account.PrintStatement();
+                    break;
+
+                case "5":
                     Console.WriteLine("Thank you for banking with us");
                     return;
 
@@ -58,7 +62,8 @@ class Program
         Console.WriteLine("1. Deposit:");
         Console.WriteLine("2. Withdraw:");
         Console.WriteLine("3. View Balance:");
-        Console.WriteLine("4. Exit:");
+        Console.WriteLine("4. Print Statement:");
+        Console.WriteLine("5. Exit:");
         Console.Write("Enter your choice: ");
     }
 
@@ -76,6 +81,8 @@ class Program
                 {
                     account.Withdraw(amount);
                 }
+
+                BankService.AddOrUpdateAccount(account);
             }
             catch (ArgumentException ex)
             {
