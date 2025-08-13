@@ -10,6 +10,7 @@ namespace BankingApp.Models
     {
         public string Owner { get; set; } = owner;
         public decimal Balance { get; set; } = 0;
+        public List<Transaction> TransactionHistory { get; set; } = [];
 
         public void Deposit(decimal amount)
         {
@@ -19,6 +20,7 @@ namespace BankingApp.Models
             }
 
             Balance += amount;
+            TransactionHistory.Add(new Transaction { Amount = amount, Date = DateTime.Now, Type = TransactionType.Deposit, BalanceAfter = Balance });
             Console.WriteLine($"{amount:C} deposited successfully");
         }
 
@@ -31,14 +33,22 @@ namespace BankingApp.Models
             }
 
             Balance -= amount;
+            TransactionHistory.Add(new Transaction { Amount = amount, Date = DateTime.Now, Type = TransactionType.Withdraw, BalanceAfter = Balance });
 
             Console.WriteLine($"{amount:C} withdrawn successfully");
-
         }
 
         public string GetBalance()
         {
             return $"Balance: {Balance:C}";
+        }
+
+        public void PrintStatement()
+        {
+            foreach(Transaction transaction in TransactionHistory)
+            {
+                Console.WriteLine(transaction.ToString());
+            }
         }
 
         public override string ToString()
