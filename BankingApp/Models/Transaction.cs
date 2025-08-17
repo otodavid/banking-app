@@ -15,7 +15,7 @@ namespace BankingApp.Models
 
         public override string ToString()
         {
-            return $"{Date:yyyy-MM-dd HH:mm}\t{Type}\t{Amount:C}\t\t{BalanceAfter:C}";
+            return $"{Date:yyyy-MM-dd HH:mm}\t{Type} \t\t {Amount:C} \t\t {BalanceAfter:C}";
         }
     }
 }
