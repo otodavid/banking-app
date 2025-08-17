@@ -7,13 +7,17 @@ A basic console-based banking application written in C#. This app allows users t
 - Create a bank account
 - Deposit funds
 - Withdraw funds
+- View Statement
 - View account balance
 - Simple error handling
+- Storing accounts data in local json file
 
 ## 📂 Structure
 
 - `Program.cs` - Main app entry
 - `Models/BankAccount.cs` - Bank account class
+- `Models/AccountRepository.cs` - Account repository class
+- `Models/BankService.cs` - Bank services class
 
 ## 🛠️ Getting Started
 
