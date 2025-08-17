@@ -9,73 +9,93 @@ namespace BankingApp.Models
 {
     public class BankService
     {
-        private static readonly string filePath = @"C:\dev\accounts.json";
-        private static readonly JsonSerializerOptions CachedJsonOptions = new JsonSerializerOptions { WriteIndented = true };
-
-        public static List<BankAccount> LoadAccounts()
+        private readonly AccountsRepository _repository;
+        private readonly Random _ang = new Random();
+        public BankService(AccountsRepository repository)
         {
-            string? directory = Path.GetDirectoryName(filePath);
-
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            if (!File.Exists(filePath))
-            {
-                File.WriteAllText(filePath, "[]");
-                return new List<BankAccount>();
-            }
-
-            var jsonString = File.ReadAllText(filePath);
-
-            return JsonSerializer.Deserialize<List<BankAccount>>(jsonString) ?? new List<BankAccount>();
+            _repository = repository;
         }
 
-        public static void SaveAccounts(List<BankAccount> accounts)
+        public BankAccount CreateAccount(string ownerName, decimal initialDeposit)
         {
-            string? directory = Path.GetDirectoryName(filePath);
-
-            if (!String.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            if (string.IsNullOrWhiteSpace(ownerName))
             {
-                Directory.CreateDirectory(directory);
+                throw new ArgumentException("Owner name is required");
             }
 
-            var jsonData = JsonSerializer.Serialize(accounts, CachedJsonOptions);
-            File.WriteAllText(filePath, jsonData);
+            if (initialDeposit < 0)
+            {
+                throw new ArgumentException("Initial deposit must be greater than 0");
+            }
+
+            string accountNumber;
+
+            do
+            {
+                accountNumber = _ang.Next(100000, 999999).ToString();
+            } while (
+                _repository.GetAccountByAccountNumber(accountNumber) != null
+            );
+
+            var account = new BankAccount
+            {
+                AccountNumber = accountNumber,
+                Balance = initialDeposit,
+                OwnerName = ownerName,
+                TransactionHistory = new List<Transaction>
+                {
+                    new Transaction
+                    {
+                        Amount = initialDeposit,
+                        Date = DateTime.Now,
+                        Type = TransactionType.Deposit,
+                        BalanceAfter = initialDeposit
+                    }
+                }
+            };
+
+            _repository.AddOrUpdateAccount(account);
+            return account;
         }
 
-        public static BankAccount GetOrCreateAccount(string owner)
+        public void Deposit(decimal amount, BankAccount account)
         {
-            var accounts = LoadAccounts();
-
-            var user = accounts.FirstOrDefault(a => a.Owner == owner);
-
-            if (user == null)
+            if (amount <= 0)
             {
-                var newAccount = new BankAccount(owner);
-                accounts.Add(newAccount);
-                SaveAccounts(accounts);
-
-                return newAccount;
+                throw new ArgumentException("Deposit must be greater than 0");
             }
 
-            return user;
+            account.Balance += amount;
+            account.TransactionHistory.Add(
+                new Transaction
+                {
+                    Amount = amount,
+                    Date = DateTime.Now,
+                    Type = TransactionType.Deposit,
+                    BalanceAfter = account.Balance
+                }
+             );
+            Console.WriteLine($"{amount:C} deposited successfully");
         }
 
-        public static void AddOrUpdateAccount(BankAccount account)
+        public void Withdraw(decimal amount, BankAccount account)
         {
-            var accounts = LoadAccounts();
-
-            var existingUser = accounts.FirstOrDefault(a => a.Owner == account.Owner);
-
-            if(existingUser != null)
+            if (amount < 0) throw new ArgumentException("Withdraw amount must be positive");
+            if (amount > account.Balance)
             {
-                accounts.Remove(existingUser);
+                throw new InvalidOperationException("Insufficient Funds");
             }
 
-            accounts.Add(account);
-            SaveAccounts(accounts);
+            account.Balance -= amount;
+            account.TransactionHistory.Add(
+                new Transaction 
+                { 
+                    Amount = amount, 
+                    Date = DateTime.Now, 
+                    Type = TransactionType.Withdraw, 
+                    BalanceAfter = account.Balance });
+
+            Console.WriteLine($"{amount:C} withdrawn successfully");
         }
     }
 }
