@@ -6,54 +6,29 @@ using System.Threading.Tasks;
 
 namespace BankingApp.Models
 {
-    public class BankAccount(string owner)
+    public class BankAccount()
     {
-        public string Owner { get; set; } = owner;
-        public decimal Balance { get; set; } = 0;
+        public string OwnerName { get; set; } = "";
+        public string AccountNumber { get; set; } = "";
+        public decimal Balance { get; set; }
         public List<Transaction> TransactionHistory { get; set; } = [];
 
-        public void Deposit(decimal amount)
+        public void PrintBalance()
         {
-            if (amount <= 0)
-            {
-                throw new ArgumentException("Deposit must be greater than 0");
-            }
-
-            Balance += amount;
-            TransactionHistory.Add(new Transaction { Amount = amount, Date = DateTime.Now, Type = TransactionType.Deposit, BalanceAfter = Balance });
-            Console.WriteLine($"{amount:C} deposited successfully");
-        }
-
-        public void Withdraw(decimal amount)
-        {
-            if (amount < 0) throw new ArgumentException("Withdraw amount must be positive");
-            if (amount > Balance)
-            {
-                throw new InvalidOperationException("Insufficient Funds");
-            }
-
-            Balance -= amount;
-            TransactionHistory.Add(new Transaction { Amount = amount, Date = DateTime.Now, Type = TransactionType.Withdraw, BalanceAfter = Balance });
-
-            Console.WriteLine($"{amount:C} withdrawn successfully");
-        }
-
-        public string GetBalance()
-        {
-            return $"Balance: {Balance:C}";
+            Console.WriteLine($"Balance: {Balance:C}");
         }
 
         public void PrintStatement()
         {
-            foreach(Transaction transaction in TransactionHistory)
+            Console.WriteLine("Date\t\t\tTransaction\t\t Amount\t\t\t Balance");
+            foreach (Transaction transaction in TransactionHistory)
             {
                 Console.WriteLine(transaction.ToString());
             }
         }
-
         public override string ToString()
         {
-            return $"Account name: {Owner}.\nAccount Balance: {Balance}";
+            return $"Account name: {OwnerName}.\nAccount Number: {AccountNumber}.\nAccount Balance: {Balance}";
         }
     }
 }
